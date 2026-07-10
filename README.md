@@ -1,125 +1,118 @@
-# Autoencoder-Based Spike Sorting (ABSS)
+# Autoencoders in Spike Sorting — Scripts complémentaires
 
-# Autoencoder-Based Spike Sorting (ABSS)
+Ce dépôt contient les scripts que nous avons développés en complément du travail
+original d'Ardelean et al. sur l'utilisation d'autoencodeurs comme méthode
+d'extraction de caractéristiques pour le spike sorting.
 
-Unsupervised feature extraction for spike sorting, using autoencoders trained
-with a clustering-aware loss function.
+## Article et dépôt original
 
-Code accompanying:
+Ce travail s'appuie entièrement sur le code et les données publiés par les auteurs
+de l'article suivant :
 
-> E. Kompaniets, S. Le Cam, R. Ranta. **Improving Feature Extraction for Spike
-> Sorting Using a Custom Loss Function for an Autoencoder.** Biosignals /
-> Biostec 2026.
+> E.-R. Ardelean, A. Coporîie, A.-M. Ichim, M. Dînșoreanu, R. C. Mureșan,
+> "A study of autoencoders as a feature extraction technique for spike sorting",
+> PLOS ONE 18(3): e0282810, 2023.
+> https://doi.org/10.1371/journal.pone.0282810
 
-Built on top of the autoencoder architectures from:
+Dépôt GitHub original : https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting
 
-> E-R. Ardelean, A. Coporîie, A-M. Ichim, M. Dînșoreanu, R.C. Mureșan. **A
-> study of autoencoders as a feature extraction technique for spike
-> sorting.** PLOS ONE 18(3): e0282810, 2023.
-> [doi.org/10.1371/journal.pone.0282810](https://doi.org/10.1371/journal.pone.0282810)
-> · [original code](https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting)
-
----
-
-## Method
-
-Spike sorting pipelines rely on filtering, spike detection, feature
-extraction, and clustering — with feature extraction being the step that
-most determines the separability of the resulting clusters.
-
-ABSS trains an autoencoder to produce a low-dimensional latent representation
-of spike waveforms, optimized not only for reconstruction but for
-**cluster separability**:
-
-$$
-\mathcal{L}_\text{combined} = \alpha\, \mathcal{L}_\text{intra} - \beta\, \mathcal{L}_\text{inter}
-$$
-
-$$
-\mathcal{L}_\text{intra} = \frac{1}{K}\sum_{k=1}^{K} \mathcal{V}_k,
-\qquad
-\mathcal{L}_\text{inter} = \min_{\substack{k,\ell \in \{1,\dots,K\}\\ k \neq \ell}} \left\lVert \mu_k - \mu_\ell \right\rVert_2^2
-$$
-
-$\mu_k$, $\mathcal{V}_k$: centroid and variance of class $k$ in the latent
-space. $\mathcal{L}_\text{intra}$ penalizes intra-cluster dispersion,
-$\mathcal{L}_\text{inter}$ rewards inter-cluster separation.
-
-**Pipeline:** an unsupervised spike sorter gives an initial cluster estimate
-→ a representative subset (*core*) is sampled from each cluster → the
-encoder is trained on this subset with $\mathcal{L}_\text{combined}$ → the
-trained encoder is applied to the full dataset and clustered (K-means) to
-recover single units.
-
-Architecture: fully connected encoder/decoder, 79-sample input, hidden
-layers of 60/40/20 units, latent code size 3.
-
-## Structure
-
-```
-common/              shared utilities
-dataset_parsing/     loading of simulated and real datasets
-neural_networks/
-  autoencoder/        AE architectures + combined loss
-preprocess/           spike alignment and scaling
-validation/
-  performance.py       clustering metrics (ARI, AMI, VM, DBS, CHS, SS) + DBSCAN
-visualization/         waveform / cluster plots
-real_data/
-weights/               trained model weights
-ae_function.py         core pipeline: data splitting, wavelet decomposition, train/test
-run.py                 main entry point
-sota_eval.py            comparison against PCA / ICA / Isomap
-```
-
-## Data
-
-- **Synthetic:** 95 single-channel simulations (Pedreira et al., 2012), 2–20
-  single-unit clusters + multi-unit noise, 24 kHz, 79 samples/waveform.
-- **Real:** *in vivo* extracellular recordings (32-channel NeuroNexus A32-tet
-  probes), mouse visual cortex.
+Nos scripts (`ae_function_cb.py`, `main_sim.py`, `main_real.py`) doivent être
+utilisés **en complément** du code de ce dépôt, pas comme un projet
+indépendant.
 
 ## Installation
+
+### 1. Télécharger le dépôt original
+
+```bash
+git clone https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting.git
+cd Autoencoders-in-Spike-Sorting
+```
+
+### 2. Installer les dépendances
+
+Les dépendances nécessaires sont listées dans le fichier `requirements.txt` du
+dépôt original :
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+### 3. Télécharger les données
+
+- **Données synthétiques** (simulations) :
+  https://1drv.ms/u/s!AgNd2yQs3Ad0gSjeHumstkCYNcAk?e=QfGIJO
+  ou https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
+- **Données réelles** :
+  https://www.kaggle.com/datasets/ardeleanrichard/realdata
+  ou dossier `real_data` du dépôt original
+
+Placer les données selon l'arborescence recommandée par le dépôt original
+(chemin à configurer dans `constants.py`) :
+
+```
+DATA/
+├── TINS/
+│   └── M045_009/      <- fichiers de données réelles
+└── SIMULATIONS/       <- fichiers de données synthétiques
+```
+
+### 4. Ajouter nos fichiers
+
+Placer nos fichiers dans le dépôt cloné, aux emplacements suivants (même
+arborescence que le dépôt original) :
+
+```
+Autoencoders-in-Spike-Sorting/
+├── ae_function.py          <- à remplacer par notre version (code original
+│                               de l'article, inchangé, + import vers
+│                               ae_function_cb.py)
+├── ae_function_cb.py       <- NOUVEAU : fonctions que nous avons ajoutées
+│                               (separation_data, decomposition_ondelettes,
+│                               run_autoencoder_train, run_autoencoder_test,
+│                               create_dossier, save_model, ...)
+├── main_sim.py             <- NOUVEAU : reproduit nos résultats sur les
+│                               données simulées
+├── main_real.py            <- NOUVEAU : reproduit nos résultats sur les
+│                               données réelles
+├── validation/
+│   └── performance.py      <- à remplacer par notre version (ajout de
+│                               classification_DBSCAN + correction du calcul
+│                               des métriques internes)
+├── neural_networks/
+│   └── autoencoder/
+│       └── autoencoder.py  <- à remplacer par notre version (ajustements des
+│                               fonctions de perte intra/inter-classe)
+└── visualization/
+    └── scatter_plot.py     <- à remplacer par notre version (ajout d'un
+                                titre sur les graphiques 3D)
+```
+
+> Les autres fichiers du dépôt original (`dataset_parsing/`,
+> `preprocess/`, `utils/`, etc.) restent inchangés.
+
+## Lancer les scripts
+
+Une fois l'installation ci-dessus effectuée, se placer à la racine du dépôt et
+lancer :
 
 ```bash
-python run.py --simulation 4 --code_size 3 --clustering kmeans
+# Reproduire les résultats sur les données simulées
+python main_sim.py
+
+# Reproduire les résultats sur les données réelles
+python main_real.py
 ```
 
-## Metrics
+## Résumé de nos modifications par rapport au code original
 
-External (require ground truth): Adjusted Rand Index, Adjusted Mutual
-Information, V-Measure. Internal: Davies-Bouldin, Calinski-Harabasz,
-Silhouette.
+| Fichier | Modification |
+|---|---|
+| `ae_function.py` → `ae_function_cb.py` | Fonctions ajoutées séparées dans un nouveau fichier, importé depuis `ae_function.py` (inchangé) |
+| `validation/performance.py` | Ajout de `classification_DBSCAN` ; correction d'un bug (les métriques internes DBS/CHS/SS étaient calculées sur les labels réels au lieu des labels prédits) |
+| `neural_networks/autoencoder/autoencoder.py` | Ajustements des fonctions de perte intra/inter-classe |
+| `visualization/scatter_plot.py` | Ajout d'un titre sur les graphiques 3D |
 
-## Citation
+## Contact
 
-```bibtex
-@inproceedings{kompaniets2026abss,
-  title     = {Improving Feature Extraction for Spike Sorting Using a Custom Loss Function for an Autoencoder},
-  author    = {Kompaniets, Elizaveta and Le Cam, Steven and Ranta, Radu},
-  booktitle = {Biosignals / Biostec},
-  year      = {2026}
-}
-
-@article{ardelean2023autoencoders,
-  title   = {A study of autoencoders as a feature extraction technique for spike sorting},
-  author  = {Ardelean, Eugen-Richard and Coporîie, Andreea and Ichim, Ana-Maria and Dînșoreanu, Mihaela and Mureșan, Raul Cristian},
-  journal = {PLOS ONE},
-  volume  = {18},
-  number  = {3},
-  pages   = {e0282810},
-  year    = {2023},
-  doi     = {10.1371/journal.pone.0282810}
-}
-```
-
-## Acknowledgments
-
-CRAN (UMR 7039, CNRS – Université de Lorraine), in collaboration with the
-Institut de Cancérologie de Lorraine and CHRU de Nancy.
+<!-- TODO : ajouter vos coordonnées / celles de votre encadrant -->
