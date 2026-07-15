@@ -35,8 +35,7 @@ git clone https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting.git
 3. Download the data:
 
    - Synthetic data:
-     https://1drv.ms/u/s!AgNd2yQs3Ad0gSjeHumstkCYNcAk?e=QfGIJO
-     or https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
+     https: https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
    - Real data:
      https://www.kaggle.com/datasets/ardeleanrichard/realdata
      or the `real_data` folder of the original repository
