@@ -1,38 +1,84 @@
 # Autoencoders-in-Spike-Sorting
-Autoencoders, a type of neural network that allow for unsupervised learning, can be used in the feature extraction of spike sorting.
 
-This study has been published in PLOS One:
+Autoencoders, a type of neural network that allows for unsupervised learning,
+can be used for feature extraction in spike sorting.
+
+This repository extends the original implementation from the study published
+in PLOS One:
+
 - https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0282810
 - DOI: 10.1371/journal.pone.0282810
+- Original repository: https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting
 
 ## Citation
+
 We would appreciate it if you cite the paper when you use this work:
 
-- For Plain Text:
 ```
-E.-R. Ardelean, A. Coporîie, A.-M. Ichim, M. Dînșoreanu, and R. C. Mureșan, “A study of autoencoders as a feature extraction technique for spike sorting,” PLOS ONE, vol. 18, no. 3, p. e0282810, Mar. 2023, doi: 10.1371/journal.pone.0282810.
+E.-R. Ardelean, A. Coporîie, A.-M. Ichim, M. Dînșoreanu, and R. C. Mureșan,
+"A study of autoencoders as a feature extraction technique for spike sorting,"
+PLOS ONE, vol. 18, no. 3, p. e0282810, Mar. 2023,
+doi: 10.1371/journal.pone.0282810.
 ```
 
 ## Setup
-The 'requirements.txt' file indicates the dependencies required for running the code. 
 
-The synthetic data used in this study can be downloaded from: 
-https://1drv.ms/u/s!AgNd2yQs3Ad0gSjeHumstkCYNcAk?e=QfGIJO
-or
-https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset.
+1. Clone the original repository:
 
-The real data used in this study can be downloaded from:
-https://www.kaggle.com/datasets/ardeleanrichard/realdata
-or in the 'real_data' folder of the repository.
+```bash
+git clone https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting.git
+```
 
+2. Install the dependencies listed in the original repository's
+   `requirements.txt`.
 
-In the constants.py file the path to the DATA folder can be set. We recommend the following structure for the data:
+3. Download the data:
 
+   - Synthetic data:
+     https://1drv.ms/u/s!AgNd2yQs3Ad0gSjeHumstkCYNcAk?e=QfGIJO
+     or https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
+   - Real data:
+     https://www.kaggle.com/datasets/ardeleanrichard/realdata
+     or the `real_data` folder of the original repository
+
+   Set the path to the `DATA` folder in `constants.py`. Recommended
+   structure:
+
+```
 DATA/
-* TINS/
-  * M045_009/ : insert the real data files
-* SIMULATIONS/ : insert the synthetic data files
+├── TINS/
+│   └── M045_009/      : real data files
+└── SIMULATIONS/        : synthetic data files
+```
 
+4. Add our files into the cloned repository, at the following locations
+   (same folder structure as the original repository):
 
-# Contact
-If you have any questions, feel free to contact me. (Email: ardeleaneugenrichard@gmail.com)
+```
+Autoencoders-in-Spike-Sorting/
+├── ae_function.py
+├── ae_function_cb.py
+├── main_sim.py
+├── main_real.py
+├── neural_networks/
+│   └── autoencoder/
+│       └── autoencoder.py
+├── validation/
+│   └── performance.py
+└── visualization/
+    └── scatter_plot.py
+```
+
+## Run
+
+```bash
+python main_sim.py
+python main_real.py
+```
+
+## Contact
+
+If you have any questions, feel free to contact us:
+
+- Steven Le Cam — steven.le-cam@univ-lorraine.fr
+- Radu Ranta — radu.ranta@univ-lorraine.fr
