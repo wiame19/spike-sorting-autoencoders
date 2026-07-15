@@ -193,7 +193,7 @@ while iter<100:
         """Enregistrement du modèle"""
         save_model(autoencoder_mse, dossier, f'model_ch{SIM_TRAIN}_{loss_function}_code{CODE}_epochs{EPOCHS}_iteration{iter}.weights.h5')
 
-        """ Validation du modèle — protocole du prof : for k=1:20, classif=kmeans, SS=silhouette """
+        """ Validation du modèle : for k=1:20, classif=kmeans, SS=silhouette """
 
         spikes = np.array(units_in_ch[SIM_TRAIN-1])
         features_mse = encoder_mse.predict(spikes, verbose=0)
