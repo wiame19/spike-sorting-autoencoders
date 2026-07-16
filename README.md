@@ -15,10 +15,9 @@ in PLOS One:
 We would appreciate it if you cite the paper when you use this work:
 
 ```
-E.-R. Ardelean, A. Coporîie, A.-M. Ichim, M. Dînșoreanu, and R. C. Mureșan,
-"A study of autoencoders as a feature extraction technique for spike sorting,"
-PLOS ONE, vol. 18, no. 3, p. e0282810, Mar. 2023,
-doi: 10.1371/journal.pone.0282810.
+E. Kompaniets, S. Le Cam, and R. Ranta,
+"Improving Feature Extraction for Spike Sorting Using a Custom Loss Function for an Autoencoder,"
+in Proc. 19th International Joint Conference on Biomedical Engineering Systems and Technologies (BIOSTEC 2026), 2026.
 ```
 
 ## Setup
@@ -35,8 +34,7 @@ git clone https://github.com/ArdeleanRichard/Autoencoders-in-Spike-Sorting.git
 3. Download the data:
 
    - Synthetic data:
-     https://1drv.ms/u/s!AgNd2yQs3Ad0gSjeHumstkCYNcAk?e=QfGIJO
-     or https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
+     https: https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset
    - Real data:
      https://www.kaggle.com/datasets/ardeleanrichard/realdata
      or the `real_data` folder of the original repository
