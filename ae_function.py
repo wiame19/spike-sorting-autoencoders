@@ -48,11 +48,8 @@ def create_dossier_article(simulation_number):
     return dir_name
 
 def save_figure(folder, filename="figure.png", dpi=300):
-    # vérifie que le dossier existe
     os.makedirs(folder, exist_ok=True)
-    # chemin complet du fichier
     path = os.path.join(folder, filename)
-    # sauvegarde la figure active
     plt.savefig(path, dpi=dpi, bbox_inches="tight")
     plt.close()
     print(f"Figure sauvegardée : {path}")
@@ -110,26 +107,9 @@ def load_model(filename, folder=None):
 #     return spikes_train, labels_train, spikes_test, labels_test
 
 def separation_data(spikes, labels, pourcentage):
-    """
-    Fonction qui sépare les données en apprentissage/test en respectant le pourcentage
-    pour chaque classe.
-
-    Paramètres:
-        spikes (ndarray): matrice des spikes (nb_samples, 79)
-        labels (ndarray): vecteur des labels (nb_samples, 1)
-        pourcentage (float): proportion pour l'apprentissage
-
-    Returns:
-        spikes_train, labels_train: base de données étiquetée d'apprentissage
-        spikes_test, labels_test: base de données étiquetée de test
-    """
     n_train = round(pourcentage * len(labels))
-
-    # Données d'entraînement
     spikes_train = spikes[:n_train, :]
     labels_train = labels[:n_train]
-
-    # Données de test
     spikes_test = spikes[n_train:len(labels), :]
     labels_test = labels[n_train:len(labels)]
 
@@ -215,18 +195,6 @@ def separation_data(spikes, labels, pourcentage):
 
 
 def decomposition_ondelettes(data, wavelet, dim):
-    """
-    Fonction qui réalise la décomposition en ondelettes des potentiels d'action en récuperant que des coefficients avce la plus grande énergie (variance)
-
-    Paramètres:
-        data (ndarray): matrice des spikes (nb_samples, 79)
-        wavelet: type d'ondelette utilisée ('db4', 'sym6), et etc.)
-        dim (int): nombre de coefficients avec la plus grande variance
-
-    Returns:
-        spikes: matrice des spikes décomposés (nb_samples, dim)
-        ind_max: indices des coefficent avec la plus grande variance (dim, 1)
-    """
     print('Début de la décomposition en ondelettes des signaux:')
     spikes = []
     for signal in data:
@@ -251,34 +219,7 @@ def decomposition_ondelettes(data, wavelet, dim):
 
 
 def run_autoencoder_train(simulation_number, data, labels, code_size, output_activation, loss_function, scale=None, shuff=True, noNoise=False, decomp_ondelettes=None, nr_epochs=300, dropout=0.0, weight_init='glorot_uniform', learning_rate=0.0001, verbose=1, saveWeights=None, loadWeights=None):
-    """
-    Fonction qui définit l'architecture du modèle et réalise son enrtrainement.
-
-    Paramètres:
-        simulation_number (int): numéro de l'enregistrement d'apprentissage
-        data (ndarray): matrice des spikes d'apprentissage (nb_samples, 79)
-        labels: (ndarray): vecteur des labels associés aux spikes d'apprentissage (nb_samples, 1)
-        code_size (int): dimension du code latent
-        output_activation: fonction d'activation de la couche de sortie
-        loss_function: fonction de cout
-        scale: objet qui définit le rédimensionnement des spikes (None par défaut)
-        shuff (bool): objet qui indique si les données séront mélangées ou pas (True par défaut)
-        noNoise (bool): objet qui indique si le bruit sera supprimé ou pas (False par défaut)
-        nr_epochs (int): nombre d'époques d'apprentissage (300 par défaut)
-        saveWeights (bool): objet qui indique si les poids du modèle seront enregistrés ou pas (None par défaut)
-        dropout (float): paramètre qui fixe le pourcentage des neurones désactivés à chaque batch lors de l'entrainement (0.0 par défaut)
-        weight_init: objet qui définit l'initialisation des poids ('glorot_uniform' par défaut)
-        learning_rate (float): taux d'apprentissage (0.0001 par défaut)
-        verbose(int): paramètre qui  (1 par défaut)
-        saveWeights: objet qui indique si les poids du modèle seront enregistrés, et si oui où (None par défaut)
-        loadWeights: objet qui indique si les poids du modèle doivent etre chargés, et si oui d'où (None par défaut)
-
-        decomp_ondelettes: objet qui indique les spikes seront décomposées et si oui la dimension des spikes decomposés (None par défaut)
-
-    Returns:
-        spikes: matrice des spikes décomposés (nb_samples, dim)
-        ind_max: indices des coefficent avec la plus grande variance (dim, 1)
-    """
+    
     print("ENTRAINEMENT DU MODÈLE")
     print(" ")
     """ Récuperation des spikes et de leurs labels """
@@ -303,20 +244,16 @@ def run_autoencoder_train(simulation_number, data, labels, code_size, output_act
 
     """ Pré-processing des spikes """
     print("ÉTAPE 2: Pré-processing des données d'apprentissage:")
-    # Débruitage des spikes (suppression des spikes de label 0)
     if noNoise == True:
         spikes_train = spikes_train[labels_train != 0]
         labels_train = labels_train[labels_train!=0]
         print(f"Les données d'apprentissage sont débruités: il y a {spikes_train.shape[0]} signaux issus de {len(np.unique(labels_train))} neurones distincts.")
-    # Mélange des spikes
     if shuff == True:
         spikes_train, labels_train = shuffle(spikes_train, labels_train, random_state=None)
         print("Les données d'apprentissage sont mélangées pour un meilleur apprentissage.")
-    # Rédimensionnement des spikes
     if scale != None:
         spikes_train = choose_scale(spikes_train, scale)
         print(f"Les données d'apprentissage sont rédimensionnées sur l'echelle {scale}.")
-    # Decomposition des spikes en ondelettes
     if decomp_ondelettes != None:
         spikes_train, _ = decomposition_ondelettes(spikes_train, 'sym6',  decomp_ondelettes)
         print(f"Les données d'apprentissage sont décomposées en ondelettes: chaque spike est défini par {decomp_ondelettes} coefficients.")
@@ -324,9 +261,6 @@ def run_autoencoder_train(simulation_number, data, labels, code_size, output_act
 
     """ Définition architecture du modèle """
     print("ÉTAPE 3: Définition de l'architecture de l'autoencodeur:")
-    #ae_layers = [40,20,10]
-    # print("ae layers: ", ae_layers)
-    # ae_layers = [70, 60, 50, 40, 30, 20]
     #ae_layers = [40,20,10] pour reeldata
     ae_layers = [60,40,20]
     print(ae_layers)
@@ -370,7 +304,6 @@ def run_autoencoder_train(simulation_number, data, labels, code_size, output_act
 
     """ Phase de validation """
     print("ÉTAPE 5: Validation du modèle:")
-    # features_validation = get_codes(spikes_train, encoder)
     features_validation = encoder.predict(spikes_train)
     labels_test, labels_reels, labels_predits = classification_kmeans(features_validation, labels_train)
     print(f'Labels rééls (avant la rélabelisation): {labels_test},\nLabels réels rélabelisés: {labels_reels},\nLabels predits: {labels_predits}')
@@ -421,8 +354,6 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
             spikes_test = data
             labels_test = labels
     elif simulation_test == "all":
-        # spikes_test = np.load("spikes_apprentissage.npy", allow_pickle=True)
-        # labels_test = np.load("labels_apprentissage.npy", allow_pickle=True)
         spikes_test = np.load("spikes_apprentissage_bis.npy", allow_pickle=True)
         labels_test = np.load("labels_apprentissage_bis.npy", allow_pickle=True)
     else:
@@ -433,20 +364,17 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
             labels_test = labels
 
     """ Pré-processing des spikes """
-    # Débruitage des spikes (suppression des spikes de label 0)
     if noNoise == True:
         spikes_test = spikes_test[labels_test != 0]
         labels_test = labels_test[labels_test!=0]
-    # Rédimensionnement des spikes
     if scale != None:
         spikes_test = choose_scale(spikes_test, scale)
-    # Decomposition des spikes en ondelettes
     if decomp_ondelettes != None:
         spikes_test, _ = decomposition_ondelettes(spikes_test, 'sym6',  decomp_ondelettes)
-        # print(f'Shape spikes décomposés: {spikes_test.shape}')
+      
 
     """ Prédictions des codes latents associées aux spikes de test"""
-    # features_test = get_codes(spikes_test, encoder)
+    
     features_test = encoder.predict(spikes_test)
 
     """ Clustering des spikes de test """
@@ -464,7 +392,6 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
 
     """ Critères de performance et matrice de confusion """
 
-    # Criteres dE l'article
     metrics = affichage_metrics(features_test,labels_reels, labels_predits)
     noms_metrics=np.array(["ARI", "AMI", "VM", "DBS", "CHS", "SS"])
 
@@ -485,9 +412,8 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
 
         for bar, value in zip(bars, metrics):
             plt.text(bar.get_x() + bar.get_width()/2, value + 0.01, f"{value:.2f}",
-                    ha='center', va='bottom', fontsize=10)     # pour annoter chaque barre avec sa valeur
+                    ha='center', va='bottom', fontsize=10)    
 
-        # plt.ylim(0, 2)  # pour éviter que les textes soient coupés
         plt.show()
 
 
@@ -503,7 +429,6 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
                 scatter_plot.plot(f'Train on Sim{simulation_train} - Test on Sim{simulation_test} -  Loss: {loss_function} - labels {classification}', features_test, labels_predits, marker='o')
 
             if scale == 'divide_amplitude':
-                # ADD AMPLITUDE AFTER SCALE WITHOUT AMPL
                 amplitudes = np.reshape(amplitudes, (len(amplitudes), -1))
                 autoencoder_features_add_amplitude = np.hstack((features_test, amplitudes))
                 scatter_plot.plot('GT' + str(len(features_test)), autoencoder_features_add_amplitude, labels_reels, marker='o')
@@ -523,7 +448,6 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
                 scatter_plot.plot(f'Apprentissage sur Sim{simulation_train} - Test sur Sim{simulation_test} -  Loss: {loss_function} - labels {classification}', autoencoder_features_2d, labels_predits, marker='o')
 
             if scale == 'divide_amplitude':
-                # ADD AMPLITUDE AFTER SCALE WITHOUT AMPL
                 amplitudes = np.reshape(amplitudes, (len(amplitudes), -1))
                 autoencoder_features_add_amplitude = np.hstack((autoencoder_features, amplitudes))
                 scatter_plot.plot('GT' + str(len(autoencoder_features)), autoencoder_features_add_amplitude, labels_reels, marker='o')
@@ -544,11 +468,10 @@ def run_autoencoder_test(simulation_test, data, labels, encoder, classification,
             waveform = waveforms[label_waveform - 1]
             waveform = resample(waveform, 79)
             waveform = waveform / LA.norm(waveform)
-            peak_waveform = np.argmax(waveform) # on aligne des pics
+            peak_waveform = np.argmax(waveform) 
             peak_spike = np.argmax(spike_moyen)
             shift = peak_spike - peak_waveform
             waveform = np.roll(waveform, shift)
-            # Affichage
             plt.plot(spike_moyen, label="Moyenne des spikes predites")
             plt.plot(waveform, label="Waveform")
             plt.legend(loc='best', fontsize=8)
