@@ -55,7 +55,6 @@ DATA/
 ```
 Autoencoders-in-Spike-Sorting/
 ├── ae_function.py
-├── ae_function_cb.py
 ├── main_sim.py
 ├── main_real.py
 ├── neural_networks/
