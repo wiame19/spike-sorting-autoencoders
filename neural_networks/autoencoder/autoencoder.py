@@ -310,7 +310,7 @@ class AutoencoderModel(Model):
                 tf.ones_like(y_true, dtype=tf.float32), y_true, nb_classes)
             # tf.print("Nombre d'éléments par classe:", class_counts)
 
-            # # calcul des centroïdes
+           
             centroids = tf.math.unsorted_segment_mean(y_pred, y_true, nb_classes)
             mask1 = tf.reduce_any(centroids != 0, axis=1)
             centroids = tf.boolean_mask(centroids, mask1)
@@ -344,10 +344,6 @@ class AutoencoderModel(Model):
             #     break
 
             return loss
-
-            # # # # # tf.print('inter-class loss:', -tf.reduce_min(inter_class_distances))
-            # # # # #
-            # # # # # return -tf.reduce_min(inter_class_distances)
 
 
 
@@ -413,7 +409,7 @@ class AutoencoderModel(Model):
             return total_loss
 
 
-        # compilation et entraînement
+       
         opt = keras.optimizers.Adam(learning_rate=learning_rate)
         if self.loss_function == 'intra_class_variance_loss':
             loss = intra_class_variance_loss
@@ -427,7 +423,7 @@ class AutoencoderModel(Model):
         self.encoder.compile(optimizer=opt, loss=loss, metrics=[keras.metrics.SparseCategoricalAccuracy()])
         print('""""""""""""""""""""""""""""')
         self.encoder.fit(training_data, labels, epochs=epochs, verbose=0, callbacks=[LossMonitorCallback(min_inter_class_distance=0.25)],validation_data=(training_data, labels))
-        # self.encoder.fit(training_data, labels, epochs=epochs, verbose=verbose,validation_data=(training_data, labels))
+        
 
 
     def return_encoder(self):
