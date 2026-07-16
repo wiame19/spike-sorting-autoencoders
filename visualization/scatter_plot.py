@@ -19,7 +19,7 @@ def plot(title, X, labels=None, plot=True, marker='o', alpha=1):
     """
     if plot:
         nrDim = len(X[0])
-        fig = plt.figure() #figsize=(16, 12), dpi=400
+        fig = plt.figure() 
         plt.title(title)
         if nrDim == 2:
             if labels is None:
