@@ -7,16 +7,7 @@ import utils.constants as cs
 
 
 def plot(title, X, labels=None, plot=True, marker='o', alpha=1):
-    """
-    Plots the dataset with or without labels
-    :param title: string - the title of the plot
-    :param X: matrix - the points of the dataset
-    :param labels: vector - optional, contains the labels of the points/X (has the same length as X)
-    :param plot: boolean - optional, whether the plot function should be called or not (for ease of use)
-    :param marker: character - optional, the marker of the plot
-
-    :returns None
-    """
+    
     if plot:
         nrDim = len(X[0])
         fig = plt.figure() 
@@ -46,17 +37,7 @@ def plot(title, X, labels=None, plot=True, marker='o', alpha=1):
 
 
 def plot_grid(title, X, pn, labels=None, plot=True, marker='o'):
-    """
-    Plots the dataset with grid
-    :param title: string - the title of the plot
-    :param X: matrix - the points of the dataset
-    :param pn: integer - the number of partitions on columns and rows
-    :param labels: vector - optional, contains the labels of the points/X (has the same length as X)
-    :param plot: boolean - optional, whether the plot function should be called or not (for ease of use)
-    :param marker: character - optional, the marker of the plot
-
-    :returns None
-    """
+    
     X = preprocessing.MinMaxScaler((0, 1)).fit_transform(X)
     if plot:
         nrDim = len(X[0])
